@@ -55,8 +55,9 @@ def localize(table_of_values):
             intervals.append((float(table_of_values.iloc[i]['x']), float(table_of_values.iloc[i + 1]['x'])))
     return intervals
 
-def bisection_method_with_curves(a, b, eps, func):
+def bisection_method(a, b, eps, func):
     curves = []
+
     while (b - a) > 2 * eps:
         mid = (a + b) / 2
         x_pts, y_pts = cauchy(f, [A, mid], 0, 1, h)
@@ -81,34 +82,33 @@ eta_min, eta_max = -1.0, 1.0
 shift = 0.2
 
 table_phi = create_table(eta_min, eta_max, shift, Phi)
-# print("\nТаблица значений функции Φ(η):\n")
-# print(table_phi)
+print("\nТаблица значений функции Φ(η):\n")
+print(table_phi)
 
 intervals = localize(table_phi)
-# print("\nЛокализованные интервалы для Φ(η):", intervals)
+print("\nЛокализованные интервалы для Φ(η):", intervals)
 
-eta_star, trial_curves = bisection_method_with_curves(intervals[0][0], intervals[0][1], eps, Phi)
+eta_star, trial_curves = bisection_method(intervals[0][0], intervals[0][1], eps, Phi)
 phi_star = Phi(eta_star)
 
-print(f"\nНайденное значение η* = {eta_star:.6f}")
-print(f"Φ(η*) = {phi_star:.6f}")
-print(f"Количество пробных выстрелов: {len(trial_curves)}")
+print(f"\nНайденное значение η = {eta_star:.6f}")
+print(f"Φ(η) = {phi_star:.6f}")
+print(f"Количество выстрелов: {len(trial_curves)}")
 
 
 plt.figure(figsize=(8, 6))
+
 for eta_val, phi_val, x_pts, y_pts in trial_curves[:-1]:
-    plt.plot(x_pts, y_pts, '--', alpha=0.6, linewidth=1,
-             label=f"η={eta_val:.4f}, Φ={phi_val:.4f}")
+    plt.plot(x_pts, y_pts, '--', alpha=0.6, linewidth=1, label=f"η={eta_val:.4f}, Φ={phi_val:.4f}")
 
 eta_final, phi_final, x_final, y_final = trial_curves[-1]
-plt.plot(x_final, y_final, color='navy', linewidth=2.2,
-         label=f"η*={eta_final:.4f}, Φ={phi_final:.4f}")
+
+plt.plot(x_final, y_final, color='navy', linewidth=2.2, label=f"η={eta_final:.4f}, Φ={phi_final:.4f}")
 
 plt.scatter([b], [B], marker='x', s=80, color='red', label="Цель (x=1, y=-2)")
 
 plt.xlabel("x")
 plt.ylabel("y")
-plt.title("Метод стрельбы: все интегральные кривые (y'' = y' - x)")
 plt.legend(fontsize=8)
 plt.grid(True)
 plt.show()
